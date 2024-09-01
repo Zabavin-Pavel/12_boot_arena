@@ -40,11 +40,5 @@ class Things:
         return item1, item2
 
 
-things = Things(items)
-
-random_item1, random_item2 = things.random_items()
-
-print(f"Случайный предмет 1: {random_item1}")
-print(f"Случайный предмет 2: {random_item2}")
 
 
