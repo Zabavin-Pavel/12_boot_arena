@@ -1,4 +1,5 @@
 import random
+from random import choice, randint, shuffle
 
 items = [
     {"name": "Меч", "value": (10, 0, 0)},
@@ -25,7 +26,6 @@ items = [
     {"name": "Катана", "value": (10, 0, 0)},
 ]
 
-
 NAMES = [
     'Александр', 'Анна', 'Дмитрий', 'Екатерина', 'Иван', 'Мария', 'Сергей', 'Ольга', 'Андрей', 'Наталья',
     'Павел', 'Елена', 'Владимир', 'Ирина', 'Николай', 'Татьяна', 'Максим', 'Юлия', 'Алексей', 'Светлана',
@@ -45,18 +45,19 @@ class Things:
         self.items = items
 
     def random_items(self):
-        item1 = random.choice(self.items)
-        item2 = random.choice(self.items)
+        item1 = choice(self.items)
+        item2 = choice(self.items)
 
         while item2 == item1:
-            item2 = random.choice(self.items)
+            item2 = choice(self.items)
 
         return item1, item2
 
 
 class Person:
     def __init__(self):
-        self.set_profession(random.choice(["Warrior", "Robber", "Paladin"]))
+        self.name = random.choice(NAMES)
+        self.set_profession(choice(["Warrior", "Robber", "Paladin"]))
 
     def set_profession(self, profession):
         DEFAULT_HP = 100
@@ -80,6 +81,11 @@ class Person:
 
         self.profession = profession
 
+    def __repr__(self):
+        return (f"Name: {self.name}, Profession: {self.profession}, "
+                f"HP: {self.hp}, Attack: {self.attack}, Absorption: {self.absorption}")
+
+
 class CreatePerson(Person, Things):
     def __init__(self, items):
         Person.__init__(self)
@@ -91,29 +97,35 @@ class CreatePerson(Person, Things):
                 f"HP: {self.hp}, Attack: {self.attack}, Absorption: {self.absorption}, "
                 f"Items: [{self.item1['name']}, {self.item2['name']}]")
 
+def fight(unit1, unit2):
+    damage = max(0, unit1.attack - unit2.absorption)
+    unit2.hp -= damage
 
-unit1 = CreatePerson(items)
-unit2 = CreatePerson(items)
-unit3 = CreatePerson(items)
-unit4 = CreatePerson(items)
-unit5 = CreatePerson(items)
-unit6 = CreatePerson(items)
-unit7 = CreatePerson(items)
-unit8 = CreatePerson(items)
-unit9 = CreatePerson(items)
-unit10 = CreatePerson(items)
+    print(f"{unit1.name} ({unit1.profession}) атакует {unit2.name} ({unit2.profession}) и наносит {damage} урона.")
+    print(f"{unit2.name} ({unit2.profession}) теперь имеет {unit2.hp} HP.\n")
 
-unit11 = CreatePerson(items)
-unit12 = CreatePerson(items)
-unit13 = CreatePerson(items)
-unit14 = CreatePerson(items)
-unit15 = CreatePerson(items)
-unit16 = CreatePerson(items)
-unit17 = CreatePerson(items)
-unit18 = CreatePerson(items)
-unit19 = CreatePerson(items)
-unit20 = CreatePerson(items)
+    if unit2.hp <= 0:
+        print(f"{unit2.name} ({unit2.profession}) побежден!")
+        return unit2
+    return None
 
+def battle_royale(units):
+    round_number = 1
+    while len(units) > 1:
+        print(f"\n=== Раунд {round_number} ===")
+        shuffle(units)
 
+        for i in range(0, len(units) - 1, 2):
+            unit1 = units[i]
+            unit2 = units[i + 1]
+            loser = fight(unit1, unit2)
+            if loser:
+                units.remove(loser)
 
+        round_number += 1
 
+    if units:
+        print(f"\nПобедитель: {units[0].name} ({units[0].profession}) с {units[0].hp} HP!")
+
+units = [CreatePerson(items) for _ in range(20)]
+battle_royale(units)
